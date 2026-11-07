@@ -31,6 +31,28 @@ class QuizGame:
         print("4. 최고 점수")
         print("5. 종료")
 
+    def play(self):
+        if not self.quizzes:
+            print("등록된 퀴즈가 없습니다.")
+            return
+
+        correct = 0
+        total = len(self.quizzes)
+
+        for number, quiz in enumerate(self.quizzes, start=1):
+            print(f"\n[문제 {number}/{total}]")
+            quiz.show()
+            guess = read_number("정답 번호: ", 1, 4)
+
+            if quiz.is_correct(guess):
+                correct += 1
+                print("정답입니다!")
+            else:
+                print(f"오답입니다. 정답은 {quiz.answer}번입니다.")
+
+        score = round(correct / total * 100)
+        print(f"\n결과: {total}문제 중 {correct}문제 정답 ({score}점)")
+
     def run(self):
         try:
             while True:
@@ -40,6 +62,8 @@ class QuizGame:
                 if choice == 5:
                     print("게임을 종료합니다.")
                     break
+                elif choice == 1:
+                    self.play()
                 else:
                     print("준비 중인 기능입니다.")
         except (KeyboardInterrupt, EOFError):
