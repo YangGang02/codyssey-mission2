@@ -1,0 +1,31 @@
+from quiz import Quiz
+
+
+def default_quizzes():
+    return [
+        Quiz(
+            "숫자 10의 자료형은 무엇인가요?",
+            ["str", "bool", "int", "list"],
+            3,
+        ),
+        Quiz(
+            "input()으로 25를 입력하면 어떤 자료형으로 반환되나요?",
+            ["int", "str", "bool", "dict"],
+            2,
+        ),
+        Quiz(
+            "items = ['사과', '배', '포도']에서 items[1]의 값은?",
+            ["사과", "배", "포도", "오류가 발생한다"],
+            2,
+        ),
+        Quiz(
+            "scores = {'민수': 90, '지수': 85}에서 scores['지수']의 값은?",
+            ["민수", "지수", "90", "85"],
+            4,
+        ),
+        Quiz(
+            "사용자가 종료를 선택할 때까지 메뉴를 반복하기에 적합한 문법은?",
+            ["return", "import", "while", "def"],
+            3,
+        ),
+    ]
