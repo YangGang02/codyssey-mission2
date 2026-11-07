@@ -1,6 +1,7 @@
 from questions import default_quizzes
 from quiz import Quiz
 
+
 def read_number(prompt, minimum, maximum):
     while True:
         text = input(prompt).strip()
@@ -19,16 +20,20 @@ def read_number(prompt, minimum, maximum):
 
         print(f"{minimum}~{maximum} 사이의 숫자를 입력해 주세요.")
 
+
 def read_text(prompt):
     while True:
         value = input(prompt).strip()
         if value:
             return value
+
         print("빈 값은 입력할 수 없습니다.")
+
 
 class QuizGame:
     def __init__(self):
         self.quizzes = default_quizzes()
+        self.best_score = None
 
     def show_menu(self):
         print("\n=== Python 기초 퀴즈 ===")
@@ -60,6 +65,10 @@ class QuizGame:
         score = round(correct / total * 100)
         print(f"\n결과: {total}문제 중 {correct}문제 정답 ({score}점)")
 
+        if self.best_score is None or score > self.best_score:
+            self.best_score = score
+            print("새로운 최고 점수입니다!")
+
     def add_quiz(self):
         question = read_text("문제: ")
         choices = []
@@ -81,6 +90,12 @@ class QuizGame:
         for number, quiz in enumerate(self.quizzes, start=1):
             print(f"{number}. {quiz.question}")
 
+    def show_score(self):
+        if self.best_score is None:
+            print("아직 퀴즈를 푼 기록이 없습니다.")
+        else:
+            print(f"최고 점수: {self.best_score}점")
+
     def run(self):
         try:
             while True:
@@ -96,7 +111,8 @@ class QuizGame:
                     self.add_quiz()
                 elif choice == 3:
                     self.list_quizzes()
-                else:
-                    print("준비 중인 기능입니다.")
+                elif choice == 4:
+                    self.show_score()
+
         except (KeyboardInterrupt, EOFError):
             print("\n입력이 중단되어 게임을 종료합니다.")
