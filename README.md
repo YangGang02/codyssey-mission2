@@ -48,7 +48,7 @@ JSON은 표준 라이브러리로 읽고 쓰기 쉽고 파일을 직접 확인�
 
 저장에 실패하면 경로와 쓰기 권한을 확인합니다. 프로그램이 열려 있으면 메뉴 5번으로 종료하면서 저장을 다시 시도할 수 있습니다. 백업으로 실행한 뒤 5번으로 종료하면 복구한 내용이 `state.json`에 다시 저장됩니다.
 
-복사본에서 `state.json`을 손상시킨 뒤 다시 실행해 백업 복구를 확인했습니다.
+저장 파일이 손상됐을 때의 백업 복구 출력입니다.
 
 ```text
 state.json 파일을 읽을 수 없습니다.
@@ -58,7 +58,7 @@ state.json 파일을 읽을 수 없습니다.
 
 ## 실행 결과
 
-기본 문제 5개에서 한 문제를 추가해 6문제를 풀었습니다. 종료 후 다시 실행해 추가 문제와 최고 점수가 유지되는 것을 확인했습니다. 다음은 실행 화면의 주요 출력입니다.
+기본 문제 5개에 새 문제를 추가해 플레이하고 다시 실행한 예시입니다.
 
 ```text
 === Python 기초 퀴즈 ===
@@ -91,9 +91,9 @@ state.json 파일을 읽을 수 없습니다.
 
 ## Git 작업 기록
 
-원격 저장소는 [codyssey-mission2](https://github.com/YangGang02/codyssey-mission2)입니다. 메뉴, 문제 클래스, 풀이, 추가, 점수, 저장 기능을 각각 커밋했고, 메시지에는 구현한 내용을 짧게 적었습니다. 퀴즈 풀기는 `git checkout -b feature/quiz-play`로 분리하고 구현 후 `main`에 `git merge --no-ff feature/quiz-play`로 병합했습니다.
+원격 저장소는 [codyssey-mission2](https://github.com/YangGang02/codyssey-mission2)입니다. 메뉴, 문제 클래스, 풀이, 추가, 점수, 저장 기능은 각각 별도 커밋으로 기록되어 있습니다. 퀴즈 풀기는 `git checkout -b feature/quiz-play`로 분리한 뒤 `git merge --no-ff feature/quiz-play`로 `main`에 병합했습니다.
 
-별도 폴더에 `git clone`한 뒤 게임 실행을 확인하고 README 변경을 커밋해 푸시했습니다. 원본 폴더에서 `git pull --ff-only`를 실행해 복제본의 커밋 `0aca034`가 반영된 것을 확인했습니다.
+복제본(`git clone`)에서 README를 수정한 커밋 `0aca034`는 원격에 푸시한 뒤 원본 폴더에 `git pull --ff-only`로 반영했습니다.
 
 ```text
 $ git rev-list --count main
@@ -113,13 +113,13 @@ $ git log --oneline --graph --all
 * be0c7e5 게임 진행을 QuizGame 클래스로 분리
 ```
 
-커밋 수는 이 문서를 보완하기 전 기준이며, 그래프는 병합 구간을 발췌했습니다.
+커밋 수는 `f9dd815` 시점 기준이며, 그래프는 병합 구간의 발췌입니다.
 
 ## 보너스 과제
 
 ### 1. 랜덤 출제
 
-`random.sample()`로 전체 목록에서 문제를 중복 없이 뽑고, 뽑힌 순서대로 출제했습니다.
+`random.sample()`은 전체 목록에서 선택한 수만큼 문제를 중복 없이 뽑습니다. 뽑힌 순서대로 출제합니다.
 
 ```python
 selected = random.sample(self.quizzes, total)
@@ -127,7 +127,7 @@ selected = random.sample(self.quizzes, total)
 
 ### 2. 문제 수 선택
 
-1번을 선택하면 풀 문제 수를 입력받습니다. 1부터 등록된 문제 수까지만 허용합니다. 2를 입력했을 때 2문제만 출제되는 것을 확인했습니다.
+1번을 선택하면 1부터 등록된 문제 수까지 입력할 수 있습니다. 예를 들어 `2`를 입력하면 두 문제를 출제합니다.
 
 ```python
 total = read_number(f"몇 문제를 풀까요? (1~{len(self.quizzes)}): ", 1, len(self.quizzes))
@@ -135,15 +135,22 @@ total = read_number(f"몇 문제를 풀까요? (1~{len(self.quizzes)}): ", 1, le
 
 ### 3. 힌트 기능
 
-`Quiz`에 `hint`를 추가했습니다. 풀이 중 `h`를 누르면 힌트를 보여주고, 힌트를 본 문제마다 10점을 차감합니다. 같은 문제에서 힌트를 두 번 열고 2문제를 모두 맞혔을 때 90점이 나왔습니다.
+각 `Quiz`는 선택 사항인 `hint`를 가집니다. 풀이 중 `h`를 누르면 힌트를 표시하고, 힌트를 본 문제마다 10점을 차감합니다. 같은 문제에서 힌트를 여러 번 열어도 한 번만 차감합니다.
 
 ```python
 score = max(0, round(correct / total * 100) - hints_used * HINT_PENALTY)
 ```
 
+두 문제를 모두 맞히고 그중 한 문제에서 힌트를 사용한 경우의 출력입니다.
+
+```text
+결과: 2문제 중 2문제 정답 (90점)
+힌트 사용: 1문제
+```
+
 ### 4. 퀴즈 삭제
 
-6번에서 삭제할 번호를 선택합니다. `0`을 입력하면 취소합니다. 선택한 문제를 뺀 목록을 저장한 뒤 적용하며, 재실행 후에도 삭제한 문제가 목록에 없는 것을 확인했습니다.
+6번에서 삭제할 번호를 선택합니다. `0`을 입력하면 취소합니다. 삭제한 문제를 제외한 목록을 저장합니다. 다음 실행부터는 이 목록을 불러옵니다.
 
 ```python
 remaining = self.quizzes[:index] + self.quizzes[index + 1:]
@@ -153,7 +160,7 @@ if save_state(remaining, self.best_score, self.history):
 
 ### 5. 점수 기록 히스토리
 
-게임을 끝낼 때마다 날짜·시간, 문제 수, 정답 수, 힌트 사용 수, 점수를 `state.json`의 `history`에 저장합니다. 재실행 후 7번에서 앞서 푼 2문제의 90점 기록이 표시되는 것을 확인했습니다.
+게임을 끝낼 때마다 날짜·시간, 문제 수, 정답 수, 힌트 사용 수, 점수를 `state.json`의 `history`에 저장합니다. 7번은 저장된 기록을 최근 순서대로 표시합니다.
 
 ```python
 self.history.append({
