@@ -8,7 +8,7 @@ from quiz import Quiz
 HINT_PENALTY = 10
 
 
-def parse_number(text, minimum, maximum):
+def parse_number(text, minimum, maximum):  # 빈 입력·정수·범위 검사
     if not text:
         print("값을 입력해 주세요.")
         return None
@@ -26,14 +26,14 @@ def parse_number(text, minimum, maximum):
     return None
 
 
-def read_number(prompt, minimum, maximum):
+def read_number(prompt, minimum, maximum):  # 올바른 숫자가 나올 때까지 반복
     while True:
-        number = parse_number(input(prompt).strip(), minimum, maximum)
+        number = parse_number(input(prompt).strip(), minimum, maximum)  # 앞뒤 공백 제거
         if number is not None:
             return number
 
 
-def read_text(prompt):
+def read_text(prompt):  # 빈 문자열이면 다시 입력
     while True:
         value = input(prompt).strip()
         if value:
@@ -43,10 +43,10 @@ def read_text(prompt):
 
 
 class QuizGame:
-    def __init__(self):
+    def __init__(self):  # 문제와 점수 기록 불러오기
         self.quizzes, self.best_score, self.history = load_state()
 
-    def show_menu(self):
+    def show_menu(self):  # 메뉴 출력
         print("\n=== Python 기초 퀴즈 ===")
         print("1. 퀴즈 풀기")
         print("2. 퀴즈 추가")
@@ -56,7 +56,7 @@ class QuizGame:
         print("6. 퀴즈 삭제")
         print("7. 점수 기록")
 
-    def read_answer(self, quiz):
+    def read_answer(self, quiz):  # 정답 입력과 힌트 처리
         used_hint = False
         while True:
             text = input("정답 번호 (힌트: h): ").strip()
@@ -74,7 +74,7 @@ class QuizGame:
             if answer is not None:
                 return answer, used_hint
 
-    def play(self):
+    def play(self):  # 랜덤 출제·채점·점수 저장
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
             return
@@ -115,7 +115,7 @@ class QuizGame:
             print("새로운 최고 점수입니다!")
         save_state(self.quizzes, self.best_score, self.history)
 
-    def add_quiz(self):
+    def add_quiz(self):  # 새 문제 등록과 저장
         question = read_text("문제: ")
         choices = []
 
@@ -131,7 +131,7 @@ class QuizGame:
         else:
             print("퀴즈를 추가했지만 이번 실행에서만 볼 수 있습니다.")
 
-    def list_quizzes(self):
+    def list_quizzes(self):  # 등록된 문제 목록 출력
         if not self.quizzes:
             print("등록된 퀴즈가 없습니다.")
             return
@@ -140,13 +140,13 @@ class QuizGame:
         for number, quiz in enumerate(self.quizzes, start=1):
             print(f"{number}. {quiz.question}")
 
-    def show_score(self):
+    def show_score(self):  # 최고 점수 출력
         if self.best_score is None:
             print("아직 퀴즈를 푼 기록이 없습니다.")
         else:
             print(f"최고 점수: {self.best_score}점")
 
-    def delete_quiz(self):
+    def delete_quiz(self):  # 선택한 문제 삭제 후 저장
         if not self.quizzes:
             print("삭제할 퀴즈가 없습니다.")
             return
@@ -164,7 +164,7 @@ class QuizGame:
             self.quizzes = remaining
             print(f"퀴즈를 삭제했습니다: {question}")
 
-    def show_history(self):
+    def show_history(self):  # 게임별 점수를 최근 순으로 출력
         if not self.history:
             print("저장된 점수 기록이 없습니다.")
             return
@@ -177,7 +177,7 @@ class QuizGame:
                 f"정답 {record['correct']}개 | {record['score']}점"
             )
 
-    def run(self):
+    def run(self):  # 메뉴 반복과 기능 실행
         try:
             while True:
                 self.show_menu()

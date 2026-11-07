@@ -11,7 +11,7 @@ STATE_PATH = Path(__file__).resolve().parent / "state.json"
 BACKUP_PATH = STATE_PATH.with_suffix(".json.bak")
 
 
-def quiz_from_data(item, default_hints):
+def quiz_from_data(item, default_hints):  # JSON의 문제를 검사해 Quiz로 변환
     question = item["question"]
     choices = item["choices"]
     answer = item["answer"]
@@ -34,7 +34,7 @@ def quiz_from_data(item, default_hints):
     return Quiz(question, choices, answer, hint)
 
 
-def validate_history(history):
+def validate_history(history):  # 날짜 형식과 점수 범위 검사
     if not isinstance(history, list):
         raise ValueError("점수 기록은 목록이어야 합니다.")
 
@@ -52,7 +52,7 @@ def validate_history(history):
     return history
 
 
-def read_state(path):
+def read_state(path):  # JSON 파일 하나를 읽고 검사
     with path.open("r", encoding="utf-8") as file:
         data = json.load(file)
 
@@ -73,7 +73,7 @@ def read_state(path):
     return quizzes, best_score, history
 
 
-def load_state():
+def load_state():  # 저장 파일 → 백업 → 기본 문제 순으로 읽기
     for path in (STATE_PATH, BACKUP_PATH):
         try:
             quizzes, best_score, history = read_state(path)
@@ -92,7 +92,7 @@ def load_state():
     return default_quizzes(), None, []
 
 
-def write_json(path, data):
+def write_json(path, data):  # 임시 파일을 완성한 뒤 대상 파일 교체
     temp_path = None
     try:
         with NamedTemporaryFile(
@@ -111,7 +111,7 @@ def write_json(path, data):
             temp_path.unlink(missing_ok=True)
 
 
-def save_state(quizzes, best_score, history):
+def save_state(quizzes, best_score, history):  # 문제와 점수 저장 후 백업
     data = {
         "quizzes": [
             {

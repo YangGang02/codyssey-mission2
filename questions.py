@@ -1,7 +1,7 @@
 from quiz import Quiz
 
 
-def default_quizzes():
+def default_quizzes():  # 기본 문제 5개 생성
     return [
         Quiz(
             "숫자 10의 자료형은 무엇인가요?",
