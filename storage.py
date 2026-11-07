@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -10,7 +11,7 @@ STATE_PATH = Path(__file__).resolve().parent / "state.json"
 BACKUP_PATH = STATE_PATH.with_suffix(".json.bak")
 
 
-def quiz_from_data(item):
+def quiz_from_data(item, default_hints):
     question = item["question"]
     choices = item["choices"]
     answer = item["answer"]
@@ -25,7 +26,30 @@ def quiz_from_data(item):
     if type(answer) is not int or not 1 <= answer <= 4:
         raise ValueError("정답 번호는 1~4여야 합니다.")
 
-    return Quiz(question, choices, answer)
+    key = (question, tuple(choices), answer)
+    hint = item.get("hint", default_hints.get(key))
+    if hint is not None and not isinstance(hint, str):
+        raise ValueError("힌트는 문자열이어야 합니다.")
+
+    return Quiz(question, choices, answer, hint)
+
+
+def validate_history(history):
+    if not isinstance(history, list):
+        raise ValueError("점수 기록은 목록이어야 합니다.")
+
+    for record in history:
+        datetime.fromisoformat(record["played_at"])
+        total = record["total"]
+        correct = record["correct"]
+        hints_used = record["hints_used"]
+        score = record["score"]
+        if any(type(value) is not int for value in (total, correct, hints_used, score)):
+            raise ValueError("점수 기록의 숫자 형식이 올바르지 않습니다.")
+        if total < 1 or not (0 <= correct <= total and 0 <= hints_used <= total and 0 <= score <= 100):
+            raise ValueError("점수 기록의 숫자 범위가 올바르지 않습니다.")
+
+    return history
 
 
 def read_state(path):
@@ -40,13 +64,19 @@ def read_state(path):
         if type(best_score) is not int or not 0 <= best_score <= 100:
             raise ValueError("최고 점수가 올바르지 않습니다.")
 
-    return [quiz_from_data(item) for item in items], best_score
+    default_hints = {
+        (quiz.question, tuple(quiz.choices), quiz.answer): quiz.hint
+        for quiz in default_quizzes()
+    }
+    quizzes = [quiz_from_data(item, default_hints) for item in items]
+    history = validate_history(data.get("history", []))
+    return quizzes, best_score, history
 
 
 def load_state():
     for path in (STATE_PATH, BACKUP_PATH):
         try:
-            quizzes, best_score = read_state(path)
+            quizzes, best_score, history = read_state(path)
         except FileNotFoundError:
             continue
         except (OSError, ValueError, KeyError, TypeError):
@@ -57,9 +87,9 @@ def load_state():
             print(f"백업에서 퀴즈 {len(quizzes)}개를 복구했습니다.")
         else:
             print(f"저장된 퀴즈 {len(quizzes)}개를 불러왔습니다.")
-        return quizzes, best_score
+        return quizzes, best_score, history
 
-    return default_quizzes(), None
+    return default_quizzes(), None, []
 
 
 def write_json(path, data):
@@ -81,17 +111,19 @@ def write_json(path, data):
             temp_path.unlink(missing_ok=True)
 
 
-def save_state(quizzes, best_score):
+def save_state(quizzes, best_score, history):
     data = {
         "quizzes": [
             {
                 "question": quiz.question,
                 "choices": quiz.choices,
                 "answer": quiz.answer,
+                "hint": quiz.hint,
             }
             for quiz in quizzes
         ],
         "best_score": best_score,
+        "history": history,
     }
 
     try:
