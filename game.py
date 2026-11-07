@@ -1,4 +1,4 @@
-from questions import default_quizzes
+from storage import load_state, save_state
 from quiz import Quiz
 
 
@@ -32,8 +32,7 @@ def read_text(prompt):
 
 class QuizGame:
     def __init__(self):
-        self.quizzes = default_quizzes()
-        self.best_score = None
+        self.quizzes, self.best_score = load_state()
 
     def show_menu(self):
         print("\n=== Python 기초 퀴즈 ===")
@@ -67,6 +66,7 @@ class QuizGame:
 
         if self.best_score is None or score > self.best_score:
             self.best_score = score
+            save_state(self.quizzes, self.best_score)
             print("새로운 최고 점수입니다!")
 
     def add_quiz(self):
@@ -79,7 +79,10 @@ class QuizGame:
 
         answer = read_number("정답 번호: ", 1, 4)
         self.quizzes.append(Quiz(question, choices, answer))
-        print("퀴즈를 추가했습니다.")
+        if save_state(self.quizzes, self.best_score):
+            print("퀴즈를 추가하고 저장했습니다.")
+        else:
+            print("퀴즈를 추가했지만 이번 실행에서만 볼 수 있습니다.")
 
     def list_quizzes(self):
         if not self.quizzes:
@@ -103,6 +106,7 @@ class QuizGame:
                 choice = read_number("선택: ", 1, 5)
 
                 if choice == 5:
+                    save_state(self.quizzes, self.best_score)
                     print("게임을 종료합니다.")
                     break
                 elif choice == 1:
@@ -115,4 +119,5 @@ class QuizGame:
                     self.show_score()
 
         except (KeyboardInterrupt, EOFError):
+            save_state(self.quizzes, self.best_score)
             print("\n입력이 중단되어 게임을 종료합니다.")
