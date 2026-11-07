@@ -40,5 +40,6 @@ state.json    게임이 실행 중에 생성하는 저장 파일
 - [퀴즈 풀이 결과](docs/screenshots/play.png)
 - [재실행 후 퀴즈 목록](docs/screenshots/list.png)
 - [재실행 후 최고 점수](docs/screenshots/score.png)
+- [저장소 복제 및 푸시](docs/screenshots/clone.png)
 - [Git 커밋 및 병합 기록](docs/screenshots/git-log.png)
 별도 폴더에 저장소를 복제해 실행 방법을 확인했습니다.
